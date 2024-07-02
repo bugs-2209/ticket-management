@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+    # Laravel Application
+    app:
+        build:
+            context: ./
+            dockerfile: ./docker/Dockerfile
+        container_name: sys-laravel
+        volumes:
+            # Mount source to /var/www/html (default)
+            -   ./:/var/www/html
+            # Mount Apache config file
+            - ./docker/apache/apache-config.conf:/etc/apache2/sites-available/000-default.conf
+        ports:
+            -   "8080:80"
+        environment:
+            -   APACHE_DOCUMENT_ROOT=/var/www/html/public
+        depends_on:
+            -   mysql
+
+    # MySQL Database
+    mysql:
+        image: mysql:8
+        container_name: sys-database
+        ports:
+            -   "3308:3306"
+        environment:
+            MYSQL_ROOT_PASSWORD: mysql_root_password
+            MYSQL_DATABASE: mysql_database_name
+            MYSQL_USER: mysql_user
+            MYSQL_PASSWORD: mysql_password
+        volumes:
+            - ./docker/mysql:/var/lib/mysql
